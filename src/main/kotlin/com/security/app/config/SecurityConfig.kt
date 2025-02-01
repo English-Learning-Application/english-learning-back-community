@@ -1,47 +1,41 @@
 package com.security.app.config
 
-import com.security.app.entities.Role
 import com.security.app.filters.JwtAuthorizationFilter
-import com.security.app.repositories.UserRepository
 import com.security.app.services.JwtUserDetailService
-import com.security.app.services.UserService
+import com.security.app.utils.JwtTokenUtils
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.NoOpPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.DefaultSecurityFilterChain
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
     @Bean
-    fun userDetailsService(userRepository: UserRepository): UserDetailsService =
-        JwtUserDetailService(userRepository)
+    fun userDetailsService(jwtTokenUtils: JwtTokenUtils): UserDetailsService =
+        JwtUserDetailService(jwtTokenUtils)
 
 
     @Bean
-    fun authenticationProvider(userRepository: UserRepository): AuthenticationProvider =
+    fun authenticationProvider(jwtTokenUtils: JwtTokenUtils): AuthenticationProvider =
         DaoAuthenticationProvider()
             .also {
-                it.setUserDetailsService(userDetailsService(userRepository))
+                it.setUserDetailsService(userDetailsService(jwtTokenUtils))
                 it.setPasswordEncoder(passwordEncoder())
             }
 
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+    fun passwordEncoder(): PasswordEncoder = NoOpPasswordEncoder.getInstance()
 
     @Bean
     fun securityFilterChain(
@@ -53,7 +47,7 @@ class SecurityConfig {
             .csrf { it.disable() }
             .cors{ it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/v1/auth/**", "/error").permitAll()
+                it.requestMatchers("/api/v1/auth/**", "/error", "/ws").permitAll()
                 it.anyRequest().authenticated()
             }
             .sessionManagement {
@@ -65,6 +59,7 @@ class SecurityConfig {
     }
 
     @Bean
-    fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
-        config.authenticationManager
+    fun webClient(builder: WebClient.Builder): WebClient {
+        return builder.build()
+    }
 }

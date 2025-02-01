@@ -1,20 +1,19 @@
 package com.security.app.services
 
-import com.security.app.repositories.UserRepository
+import com.security.app.utils.JwtTokenUtils
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.stereotype.Service
 
 class JwtUserDetailService(
-        private val userRepository: UserRepository
+    private val jwtTokenUtils: JwtTokenUtils,
 ) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByEmail(username)?: throw Exception("User not found")
+        val user = jwtTokenUtils.getUserId(username)
+            ?: throw Exception("User not found")
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.email)
-                .password(user.password)
-                .roles(user.role.name)
-                .build()
+            .withUsername(user)
+            .password("")
+            .build()
     }
 }
