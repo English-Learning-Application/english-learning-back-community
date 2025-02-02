@@ -9,6 +9,7 @@ import com.security.app.repositories.ChatSessionRepository
 import com.security.app.repositories.ChatTopicRepository
 import com.security.app.utils.toUUID
 import jakarta.transaction.Transactional
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 
 @Service
@@ -42,6 +43,33 @@ class ChatSessionService(
     }
 
     @Transactional
+    fun joinChatSession(userId: String, sessionId: String, tokenString: String, simpMessagingTemplate: SimpMessagingTemplate): ChatSession {
+        var messageUser = messageUserService.getSessionUser(userId)
+        if (messageUser == null) {
+            messageUser = messageUserService.createUser(userId, tokenString)
+        }
+
+        val chatSession = chatSessionRepository.findBySessionId(sessionId.toUUID()) ?: throw IllegalArgumentException("Session not found")
+
+        chatSession.users.add(messageUser)
+
+        val savedChatSession = chatSessionRepository.save(chatSession)
+
+        val chatMessage = ChatMessage().let {
+            it.message = "User joined the chat"
+            it.chatMessageType = ChatMessageType.JOIN
+            it.sender = messageUser
+            it.session = savedChatSession
+            it
+        }
+
+        val savedChatMessage = chatMessageRepository.save(chatMessage)
+
+        simpMessagingTemplate.convertAndSend("/group/$sessionId", savedChatMessage)
+        return savedChatSession
+    }
+
+    @Transactional
     fun createGroupChatSession(userId: String, topicId: String, tokenString: String, sessionName: String) : ChatSession {
         val chatType = ChatType.GROUP
         var messageUser = messageUserService.getSessionUser(userId)
@@ -53,6 +81,7 @@ class ChatSessionService(
 
         val chatSession = ChatSession().let {
             it.sessionType = chatType
+            it.sessionName = sessionName
             it.users = mutableSetOf(messageUser)
             it.topic = chatTopic
             it

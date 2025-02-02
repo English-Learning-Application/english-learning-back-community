@@ -2,6 +2,7 @@ package com.security.app.services
 
 import com.security.app.entities.ChatMessage
 import com.security.app.entities.ChatSession
+import com.security.app.model.ChatMessageType
 import com.security.app.model.ChatType
 import com.security.app.repositories.ChatMessageRepository
 import com.security.app.repositories.ChatSessionRepository
@@ -34,14 +35,16 @@ class ChatMessageService(
 
         val chatMessage = ChatMessage().let {
             it.message = messageText
-                it.sender = messageUser
+            it.sender = messageUser
             it.session = chatSession
+            it.chatMessageType = ChatMessageType.TEXT
             it
         }
 
         return chatMessageRepository.save(chatMessage)
     }
 
+    @Transactional
     fun saveAiResponse(messageText: String, sessionId: String) : com.security.app.entities.ChatMessage {
         val aiUser = messageUserRepository.findByExternalUserId("AI")
 

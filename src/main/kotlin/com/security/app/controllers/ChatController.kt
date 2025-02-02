@@ -17,7 +17,6 @@ class ChatController(
 ) {
     @MessageMapping("/chat/ai/{sessionId}")
     fun sendMessage(@Payload message: String, principal: Principal, @DestinationVariable sessionId: String) {
-        println("Received message: $message")
         val userId = principal.name
 
         val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId)
@@ -29,5 +28,12 @@ class ChatController(
                 val aiChatMessage = chatMessageService.saveAiResponse(response, sessionId)
                 simpMessagingTemplate.convertAndSendToUser(sessionId, "/ai-chat", aiChatMessage)
             }
+    }
+
+    @MessageMapping("/chat/group/{sessionId}")
+    fun sendGroupMessage(@DestinationVariable sessionId: String, @Payload message: String, principal: Principal) {
+        val userId = principal.name
+        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId)
+        simpMessagingTemplate.convertAndSend("/group/$sessionId", sentChatMessage)
     }
 }

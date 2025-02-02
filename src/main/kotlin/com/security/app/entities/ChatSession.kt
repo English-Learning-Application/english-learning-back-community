@@ -36,10 +36,10 @@ class ChatSession {
         joinColumns = [JoinColumn(name = "session_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
-    var users: Set<MessageUser> = HashSet()
+    var users: MutableSet<MessageUser> = mutableSetOf()
 
     @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL])
-    var messages: Set<ChatMessage> = HashSet()
+    var messages: MutableSet<ChatMessage> = mutableSetOf()
 
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = true)
