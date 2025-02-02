@@ -8,5 +8,7 @@ import java.util.UUID
 interface ChatSessionRepository : JpaRepository<ChatSession, UUID> {
     fun findAllBySessionId(sessionId: UUID): List<ChatSession>
     fun findBySessionId(sessionId: UUID): ChatSession?
-    fun findAllBySessionTypeAndUsers_UserId(chatType: ChatType, userId: UUID): List<ChatSession>
+    fun findAllBySessionTypeAndUsers_ExternalUserId(chatType: ChatType, userId: String): List<ChatSession>
+    fun deleteBySessionId(sessionId: UUID)
+    fun findAllByTopic_TopicId(topicId: UUID): List<ChatSession>
 }

@@ -1,13 +1,13 @@
 package com.security.app.entities
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.security.app.model.Language
 import jakarta.persistence.*
 import lombok.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Setter
@@ -18,33 +18,29 @@ import java.util.*
 @Builder
 @ToString
 @EntityListeners(AuditingEntityListener::class)
-class MessageUser {
+class ChatTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    lateinit var userId: UUID
+    lateinit var topicId: UUID
 
     @Column(nullable = false)
-    var username: String = ""
-
-    @Column(nullable = true)
-    var imageUrl: String? = null
+    @Enumerated(EnumType.STRING)
+    var topicLanguage: Language = Language.ENGLISH
 
     @Column(nullable = false)
-    var email: String = ""
+    var topicNameEnglish: String = ""
 
     @Column(nullable = false)
-    var phoneNumber: String = ""
+    var topicNameVietnamese: String = ""
 
-    @Column(nullable = true)
-    var externalUserId: String? = null
+    @Column(nullable = false)
+    var topicNameFrench: String = ""
 
-    @OneToMany(mappedBy = "sender", cascade = [CascadeType.ALL])
-    @JsonIgnore
-    var messages: Set<ChatMessage> = HashSet()
+    @Column(nullable = false)
+    var topicDescription: String = ""
 
-    @ManyToMany(mappedBy = "users")
-    @JsonIgnore
-    var chatSessions: Set<ChatSession> = HashSet()
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    var sessions: Set<ChatSession> = HashSet()
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

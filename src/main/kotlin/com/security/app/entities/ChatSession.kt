@@ -1,5 +1,6 @@
 package com.security.app.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.security.app.model.ChatType
 import jakarta.persistence.*
 import lombok.*
@@ -26,6 +27,9 @@ class ChatSession {
     @Column(nullable = false)
     var sessionType: ChatType = ChatType.PRIVATE
 
+    @Column(nullable = true)
+    var sessionName: String? = null
+
     @ManyToMany
     @JoinTable(
         name = "chat_session_users",
@@ -36,6 +40,11 @@ class ChatSession {
 
     @OneToMany(mappedBy = "session", cascade = [CascadeType.ALL])
     var messages: Set<ChatMessage> = HashSet()
+
+    @ManyToOne
+    @JoinColumn(name = "topic_id", nullable = true)
+    @JsonIgnore
+    var topic: ChatTopic? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

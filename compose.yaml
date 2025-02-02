@@ -13,6 +13,8 @@ services:
       JWT_ISSUER: ${SECRET_ISSUER}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
+      PROFILE_SERVICE_URL: ${PROFILE_SERVICE_URL}
+      OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}
     ports:
       - ${APP_PORT}
 

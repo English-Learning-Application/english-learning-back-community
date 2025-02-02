@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
 interface ChatMessageRepository : JpaRepository<ChatMessage, UUID> {
-    fun findAllBySessionSessionIdOrderBySentAtDesc(sessionId: UUID, pageable: Pageable): Page<ChatMessage>
+    fun findAllBySessionSessionId(sessionId: UUID, pageable: Pageable): Page<ChatMessage>
 }

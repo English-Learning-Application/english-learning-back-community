@@ -24,9 +24,10 @@ class WebSocketConfig(
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableSimpleBroker("/topic", "/queue", "/user") // Real-time updates
-        registry.setApplicationDestinationPrefixes("/app")
-        registry.setUserDestinationPrefix("/user")
+        // Define destination prefixes for different use cases
+        registry.enableSimpleBroker("/topic", "/queue", "/user", "/ai-chat", "/private", "/group") // Supports real-time updates
+        registry.setApplicationDestinationPrefixes("/app") // Prefix for client-to-server messages
+        registry.setUserDestinationPrefix("/user") // Private messaging per user session
     }
 
     override fun configureClientInboundChannel(registration: ChannelRegistration) {
