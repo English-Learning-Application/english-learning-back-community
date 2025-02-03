@@ -80,4 +80,16 @@ class CommunityController(
         val chatSessions = chatSessionService.getPrivateChatSessionsOfUser(userId)
         return ResponseEntity.ok(ListMessage.Success("Private chat sessions retrieved successfully", chatSessions))
     }
+
+    @PostMapping("/sessions/private/{receiverId}")
+    fun createPrivateChatSession(
+        request: HttpServletRequest,
+        @PathVariable("receiverId") receiverId: String,
+    ) : ResponseEntity<Message<ChatSession>> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val userId = authentication.name
+
+        val chatSession = chatSessionService.generatePrivateChatSessionWithUser(userId, receiverId, request.getHeader("Authorization"))
+        return ResponseEntity.ok(Message.Success("Private chat session created successfully", chatSession))
+    }
 }

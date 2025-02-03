@@ -115,4 +115,40 @@ class ChatSessionService(
     ): List<ChatSession> {
         return chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserId(ChatType.PRIVATE, userId)
     }
+
+    fun generatePrivateChatSessionWithUser(
+        userId: String,
+        receiverId: String,
+        tokenString: String
+    ): ChatSession {
+        val existingChatSession = chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserIdIn(ChatType.PRIVATE, listOf(userId, receiverId))
+
+        if (existingChatSession != null) {
+            return existingChatSession
+        }
+
+        var messageUser = messageUserService.getSessionUser(userId)
+        var receiverMessageUser = messageUserService.getSessionUser(receiverId)
+
+
+        if (messageUser == null && receiverMessageUser == null) {
+           val resultList = messageUserService.createListOfMessageUser(listOf(userId, receiverId), tokenString)
+            messageUser = resultList.find { it.externalUserId == userId }
+            receiverMessageUser = resultList.find { it.externalUserId == receiverId }
+        } else if (messageUser == null) {
+            messageUser = messageUserService.createUser(userId, tokenString)
+        } else if (receiverMessageUser == null) {
+            receiverMessageUser = messageUserService.createUser(receiverId, tokenString)
+        }
+
+        val chatSession = ChatSession().let {
+            it.users = mutableSetOf(messageUser!!, receiverMessageUser!!)
+            it.sessionType = ChatType.PRIVATE
+            it
+        }
+
+        val savedChatSession = chatSessionRepository.save(chatSession)
+
+        return savedChatSession
+    }
 }
