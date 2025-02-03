@@ -33,14 +33,14 @@ class ChatController(
     @MessageMapping("/chat/group/{sessionId}")
     fun sendGroupMessage(@DestinationVariable sessionId: String, @Payload message: String, principal: Principal) {
         val userId = principal.name
-        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId)
+        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId) ?: return
         simpMessagingTemplate.convertAndSend("/group/$sessionId", sentChatMessage)
     }
 
     @MessageMapping("/chat/private/{sessionId}")
     fun sendPrivateMessage(@DestinationVariable sessionId: String, @Payload message: String, principal: Principal) {
         val userId = principal.name
-        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId)
+        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId) ?: return
         simpMessagingTemplate.convertAndSendToUser(sessionId, "/private", sentChatMessage)
     }
 }
