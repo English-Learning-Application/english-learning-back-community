@@ -1,96 +1,86 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: subscription-service-deployment
+  name: community-service-deployment
   labels:
-    app: subscription-service
+    app: community-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: subscription-service
+      app: community-service
   template:
     metadata:
       labels:
-        app: subscription-service
+        app: community-service
     spec:
       containers:
-        - name: subscription-service-container
+        - name: community-service-container
           imagePullPolicy: Always
-          image: "761018889743.dkr.ecr.ap-southeast-2.amazonaws.com/subscription-microservice:latest"
+          image: "761018889743.dkr.ecr.ap-southeast-2.amazonaws.com/community-microservice:latest"
           ports:
-            - containerPort: 8087
+            - containerPort: 8089
           env:
             - name: MODE
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: MODE
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: JWT_SECRET
             - name: JWT_ISSUER
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: SECRET_ISSUER
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: DB_HOST
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: DB_NAME
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: DB_PASSWORD
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: DB_USER
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: DB_PORT
             - name: PROFILE_SERVICE_URL
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: PROFILE_SERVICE_URL
-            - name: NOTIFICATION_SERVICE_URL
+            - name: USER_SERVICE_URL
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
-                  key: NOTIFICATION_SERVICE_URL
-            - name: VNPAY_TMNCODE
+                  name: community-service-secret
+                  key: USER_SERVICE_URL
+            - name: OPEN_AI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
-                  key: VNPAY_TMNCODE
-            - name: VNPAY_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: subscription-service-secret
-                  key: VNPAY_SECRET_KEY
+                  name: community-service-secret
+                  key: OPEN_AI_API_KEY
             - name: APP_PORT
               valueFrom:
                 secretKeyRef:
-                  name: subscription-service-secret
+                  name: community-service-secret
                   key: APP_PORT
-            - name: INTERNAL_BASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: subscription-service-secret
-                  key: INTERNAL_BASE_URL
           resources:
             requests:
               memory: "256Mi"
@@ -102,12 +92,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: subscription-cluster-ip-service
+  name: community-cluster-ip-service
 spec:
   selector:
-    app: subscription-service
+    app: community-service
   ports:
     - protocol: TCP
-      port: 8087
-      targetPort: 8087
+      port: 8089
+      targetPort: 8089
   type: ClusterIP

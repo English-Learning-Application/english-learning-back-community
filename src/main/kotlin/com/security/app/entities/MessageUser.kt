@@ -40,11 +40,11 @@ class MessageUser {
 
     @OneToMany(mappedBy = "sender", cascade = [CascadeType.ALL])
     @JsonIgnore
-    var messages: Set<ChatMessage> = HashSet()
+    var messages: MutableSet<ChatMessage> = mutableSetOf()
 
     @ManyToMany(mappedBy = "users")
     @JsonIgnore
-    var chatSessions: Set<ChatSession> = HashSet()
+    var chatSessions: MutableSet<ChatSession> = mutableSetOf()
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

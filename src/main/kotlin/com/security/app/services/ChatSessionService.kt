@@ -116,12 +116,23 @@ class ChatSessionService(
         return chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserId(ChatType.PRIVATE, userId)
     }
 
+    @Transactional
     fun generatePrivateChatSessionWithUser(
         userId: String,
         receiverId: String,
         tokenString: String
     ): ChatSession {
-        val existingChatSession = chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserIdIn(ChatType.PRIVATE, listOf(userId, receiverId))
+
+        println("The Receiver ID: $receiverId")
+        println("The User ID: $userId")
+        val existingChatSessions = chatSessionRepository.findBySessionTypeAndUsers_ExternalUserIdIn(ChatType.PRIVATE, listOf(userId, receiverId))
+
+        val existingChatSession = existingChatSessions.find { session ->
+            session.users.map { it.externalUserId }.containsAll(listOf(userId, receiverId)).and(session.users.size == 2)
+        }
+
+        println("Existing chat session: ${existingChatSession?.sessionId}")
+        println("Existing chat session: ${existingChatSession?.users?.map { it.externalUserId }}")
 
         if (existingChatSession != null) {
             return existingChatSession
@@ -140,6 +151,7 @@ class ChatSessionService(
         } else if (receiverMessageUser == null) {
             receiverMessageUser = messageUserService.createUser(receiverId, tokenString)
         }
+
 
         val chatSession = ChatSession().let {
             it.users = mutableSetOf(messageUser!!, receiverMessageUser!!)
