@@ -83,6 +83,25 @@ class MessageUserService(
     }
 
     @Transactional
+    fun updateMessageUser(
+        userId: String,
+        username: String,
+        imageUrl: String,
+        email: String,
+        phoneNumber: String
+    ) : MessageUser? {
+        val messageUser = messageUserRepository.findByExternalUserId(userId)
+        messageUser?.let {
+            it.username = username
+            it.imageUrl = imageUrl
+            it.email = email
+            it.phoneNumber = phoneNumber
+            return messageUserRepository.save(it)
+        }
+        return null
+    }
+
+    @Transactional
     fun saveUser(messageUser: MessageUser) : MessageUser {
         return messageUserRepository.save(messageUser)
     }

@@ -19,7 +19,7 @@ class ChatController(
     fun sendMessage(@Payload message: String, principal: Principal, @DestinationVariable sessionId: String) {
         val userId = principal.name
 
-        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId)
+        val sentChatMessage = chatMessageService.saveChatMessage(message, userId, sessionId) ?: return
 
         simpMessagingTemplate.convertAndSendToUser(sessionId, "/ai-chat", sentChatMessage)
 
