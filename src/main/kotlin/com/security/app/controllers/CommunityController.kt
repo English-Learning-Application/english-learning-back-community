@@ -37,6 +37,17 @@ class CommunityController(
         return ResponseEntity.ok(ListMessage.Success("Chat sessions retrieved successfully", chatSessions))
     }
 
+    @GetMapping("/me/topics/{topicId}/sessions")
+    fun getChatSessionsByTopicIdAndUserId(
+        @PathVariable("topicId") topicId: String
+    ) : ResponseEntity<ListMessage<ChatSession>> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val userId = authentication.name
+
+        val chatSessions = chatSessionService.getSessionsByTopicIdAndUserId(topicId, userId)
+        return ResponseEntity.ok(ListMessage.Success("Chat sessions retrieved successfully", chatSessions))
+    }
+
     @PostMapping("/topics/{topicId}/sessions")
     fun createChatSession(
         request: HttpServletRequest,

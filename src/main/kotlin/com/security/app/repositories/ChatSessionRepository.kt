@@ -12,4 +12,5 @@ interface ChatSessionRepository : JpaRepository<ChatSession, UUID> {
     fun deleteBySessionId(sessionId: UUID)
     fun findAllByTopic_TopicId(topicId: UUID): List<ChatSession>
     fun findBySessionTypeAndUsers_ExternalUserIdIn(sessionType: ChatType, externalUserIds: List<String>): List<ChatSession>
+    fun findAllByTopic_TopicIdAndUsers_ExternalUserId(topicId: UUID, userId: String): List<ChatSession>
 }

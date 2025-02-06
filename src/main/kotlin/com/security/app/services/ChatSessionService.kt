@@ -165,4 +165,10 @@ class ChatSessionService(
 
         return savedChatSession
     }
+
+    fun getSessionsByTopicIdAndUserId(topicId: String, userId: String): List<ChatSession> {
+        return chatSessionRepository.findAllByTopic_TopicIdAndUsers_ExternalUserId(topicId.toUUID(), userId).filter {
+            it.users.map { user -> user.externalUserId }.contains(userId)
+        }
+    }
 }
