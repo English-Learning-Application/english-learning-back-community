@@ -98,7 +98,15 @@ class MessageUserService(
             it.phoneNumber = phoneNumber
             return messageUserRepository.save(it)
         }
-        return null
+        val newUser = MessageUser().let {
+            it.username = username
+            it.imageUrl = imageUrl
+            it.email = email
+            it.phoneNumber = phoneNumber
+            it.externalUserId = userId
+            it
+        }
+        return messageUserRepository.save(newUser)
     }
 
     @Transactional

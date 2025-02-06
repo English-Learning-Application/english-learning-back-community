@@ -22,7 +22,9 @@ class ChatSessionService(
     fun getSessionsByTypeAndUserId(chatType: String, userId: String): List<ChatSession> {
         val chatTypeEnum = ChatType.fromServerValue(chatType)
 
-        return chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserId(chatTypeEnum, userId)
+        return chatSessionRepository.findAllBySessionTypeAndUsers_ExternalUserId(chatTypeEnum, userId).filter {
+            it.users.map { user -> user.externalUserId }.contains(userId)
+        }
     }
 
     @Transactional
