@@ -40,3 +40,4 @@ out/
 .kotlin
 **.env
 pipeline.json
+local.env
